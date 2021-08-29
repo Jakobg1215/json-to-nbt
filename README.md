@@ -15,7 +15,7 @@ json-to-nbt <path to file>
 ```
 # Development
 - [ ] support list nesting
-- [ ] support compounds in lists
+- [x] support compounds in lists
 - [ ] support byte/int/long arrays
 - [ ] add compression argument
 

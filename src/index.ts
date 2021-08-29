@@ -303,7 +303,7 @@ export default () => {
                 case 'null': {
                     listType.writeInt8(rootTypes.INT);
                     addNBTData(Buffer.concat([listType, listLength]));
-                    value.forEach(value => {
+                    value.forEach(() => {
                         const rootData = Buffer.alloc(4);
                         addNBTData(rootData);
                     });
@@ -311,8 +311,163 @@ export default () => {
                 }
                 case 'object': {
                     listType.writeInt8(rootTypes.COMPOUND);
-                    console.log(`\x1b[31mSorry but arrays do not support objects yet.\x1b[0m`);
-                    process.exit(1);
+                    addNBTData(Buffer.concat([listType, listLength]));
+                    value.forEach(value => {
+                        const objectData: any[] = [];
+                        for (const data in value) objectData.push([data, value[data]]);
+                        objectData.forEach(value => {
+                            const rootNameLength = Buffer.alloc(2);
+                            rootNameLength.writeUInt16BE(value[0].length);
+                            const rootName = Buffer.concat([rootNameLength, Buffer.from(value[0])]);
+                            switch (typeof value[1]) {
+                                case 'string': {
+                                    if (value[1].slice(-1).match(/[bslfd]/)) {
+                                        if (!value[1].slice(0, -1).match(/[a-zA-Z]+/g)) {
+                                            switch (value[1].slice(-1)) {
+                                                case 'b': {
+                                                    const rootType = Buffer.alloc(1);
+                                                    rootType.writeInt8(rootTypes.BYTE);
+                                                    const rootData = Buffer.alloc(1);
+                                                    rootData.writeInt8(Number(value[1].slice(0, -1)));
+                                                    addNBTData(Buffer.concat([rootType, rootName, rootData]));
+                                                    break;
+                                                }
+                                                case 's': {
+                                                    const rootType = Buffer.alloc(1);
+                                                    rootType.writeInt8(rootTypes.SHORT);
+                                                    const rootData = Buffer.alloc(2);
+                                                    rootData.writeInt16BE(Number(value[1].slice(0, -1)));
+                                                    addNBTData(Buffer.concat([rootType, rootName, rootData]));
+                                                    break;
+                                                }
+                                                case 'l': {
+                                                    const rootType = Buffer.alloc(1);
+                                                    rootType.writeInt8(rootTypes.LONG);
+                                                    const rootData = Buffer.alloc(8);
+                                                    rootData.writeBigInt64BE(BigInt(Number(value[1].slice(0, -1))));
+                                                    addNBTData(Buffer.concat([rootType, rootName, rootData]));
+                                                    break;
+                                                }
+                                                case 'f': {
+                                                    const rootType = Buffer.alloc(1);
+                                                    rootType.writeInt8(rootTypes.FLOAT);
+                                                    const rootData = Buffer.alloc(4);
+                                                    rootData.writeFloatBE(Number(value[1].slice(0, -1)));
+                                                    addNBTData(Buffer.concat([rootType, rootName, rootData]));
+                                                    break;
+                                                }
+                                                case 'd': {
+                                                    const rootType = Buffer.alloc(1);
+                                                    rootType.writeInt8(rootTypes.DOUBLE);
+                                                    const rootData = Buffer.alloc(8);
+                                                    rootData.writeDoubleBE(Number(value[1].slice(0, -1)));
+                                                    addNBTData(Buffer.concat([rootType, rootName, rootData]));
+                                                    break;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    const rootType = Buffer.alloc(1);
+                                    rootType.writeInt8(rootTypes.STRING);
+                                    const rootLength = Buffer.alloc(2);
+                                    rootLength.writeUInt16BE(value[1].length);
+                                    const rootData = Buffer.concat([rootLength, Buffer.from(value[1])]);
+                                    addNBTData(Buffer.concat([rootType, rootName, rootData]));
+                                    break;
+                                }
+                                case 'number': {
+                                    const rootType = Buffer.alloc(1);
+                                    rootType.writeInt8(rootTypes.INT);
+                                    const rootData = Buffer.alloc(4);
+                                    rootData.writeInt32BE(value[1]);
+                                    addNBTData(Buffer.concat([rootType, rootName, rootData]));
+                                    break;
+                                }
+                                case 'boolean': {
+                                    const rootType = Buffer.alloc(1);
+                                    rootType.writeInt8(rootTypes.BYTE);
+                                    const rootData = Buffer.alloc(1);
+                                    rootData.writeInt8(value ? 1 : 0);
+                                    addNBTData(Buffer.concat([rootType, rootName, rootData]));
+                                    break;
+                                }
+                                case 'object': {
+                                    if (Array.isArray(value[1])) {
+                                        switch (typeof value[1][0]) {
+                                            case 'string': {
+                                                if (value[1][0].slice(-1).match(/[bslfd]/)) {
+                                                    if (!value[1][0].slice(0, -1).match(/[a-zA-Z]+/g)) {
+                                                        switch (value[1][0].slice(-1)) {
+                                                            case 'b': {
+                                                                readListNBT(value[0], 'byte', value[1]);
+                                                                break;
+                                                            }
+                                                            case 's': {
+                                                                readListNBT(value[0], 'short', value[1]);
+                                                                break;
+                                                            }
+                                                            case 'l': {
+                                                                readListNBT(value[0], 'long', value[1]);
+                                                                break;
+                                                            }
+                                                            case 'f': {
+                                                                readListNBT(value[0], 'float', value[1]);
+                                                                break;
+                                                            }
+                                                            case 'd': {
+                                                                readListNBT(value[0], 'double', value[1]);
+                                                                break;
+                                                            }
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                                readListNBT(value[0], 'string', value[1]);
+                                                break;
+                                            }
+                                            case 'number': {
+                                                readListNBT(value[0], 'int', value[1]);
+                                                break;
+                                            }
+                                            case 'boolean': {
+                                                readListNBT(value[0], 'boolean', value[1]);
+                                                break;
+                                            }
+                                            case 'object': {
+                                                if (Array.isArray(value[1][0])) {
+                                                    readListNBT(value[0], 'array', value[1]);
+                                                    break;
+                                                }
+                                                if (value[1][0] === null) {
+                                                    readListNBT(value[0], 'null', value[1]);
+                                                    break;
+                                                }
+                                                readListNBT(value[0], 'object', value[1]);
+                                                break;
+                                            }
+                                            default: {
+                                                readListNBT(value[0], 'empty', value[1]);
+                                            }
+                                        }
+                                        break;
+                                    }
+                                    if (value[1] === null) {
+                                        const rootType = Buffer.alloc(1);
+                                        rootType.writeInt8(rootTypes.INT);
+                                        const rootData = Buffer.alloc(4);
+                                        rootData.writeInt32BE(0);
+                                        addNBTData(Buffer.concat([rootType, rootName, rootData]));
+                                        break;
+                                    }
+                                    readObjectNBT(value[0], value[1]);
+                                    break;
+                                }
+                            }
+                        });
+                        addNBTData(Buffer.alloc(1));
+                    });
+                    break;
                 }
                 case 'empty': {
                     listType.writeInt8(rootTypes.END);
