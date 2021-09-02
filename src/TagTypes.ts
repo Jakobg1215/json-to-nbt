@@ -1,4 +1,4 @@
-export enum rootTypes {
+export enum TagTypes {
     END,
     BYTE,
     SHORT,
