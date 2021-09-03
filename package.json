@@ -1,9 +1,10 @@
 {
   "name": "json-to-nbt",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "A converter to convert json to nbt!",
-  "main": "dist/index.js",
+  "main": "./dist/index",
   "bin": "./to-nbt",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Jakobg1215/json-to-nbt.git"

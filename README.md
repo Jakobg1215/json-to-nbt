@@ -15,6 +15,6 @@ json-to-nbt <path to file>
 ```
 # Development
 - [ ] split fuctions into mutilple files
-- [ ] allow use as a lib
+- [x] allow use as a lib
 
 Please report any bugs found in bug reports

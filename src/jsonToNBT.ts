@@ -1,15 +1,32 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { TagTypes } from './TagTypes';
 
-export function jsonToNBT(file: object | Buffer): Buffer {
-    const fileData = Buffer.isBuffer(file)
-        ? file.filter(v => v !== 0x0d && v !== 0x0a).toString()
-        : JSON.stringify(file);
+export default () => {
+    const file = process.argv[2];
+    if (!file) {
+        console.log('\x1b[31mFile not specified!\x1b[0m');
+        process.exit(1);
+    }
+
+    if (!file.endsWith('.json')) {
+        console.log('\x1b[31mFile is not type JSON!\x1b[0m');
+        process.exit(1);
+    }
+
+    const path = join(process.cwd(), file);
+
+    const fileData = readFileSync(path)
+        .filter(v => v !== 0x0d && v !== 0x0a)
+        .toString();
 
     let jsonObject;
     try {
         jsonObject = JSON.parse(fileData);
-    } catch (error) {
-        throw error;
+    } catch {
+        console.log(`\x1b[31mSyntax Error in file ${file}!\x1b[0m`);
+        process.exit(1);
     }
 
     let nbt = Buffer.alloc(3);
@@ -66,7 +83,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                     try {
                         listData.push(encodeByte(bools ? '1' : '0'));
                     } catch {
-                        throw new SyntaxError(`${bools} is not type boolean in list ${name}!`);
+                        console.log(`\x1b[31m${bools} is not type boolean in list ${name}!\x1b[0m`);
+                        process.exit(1);
                     }
                 });
                 break;
@@ -77,7 +95,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                     try {
                         listData.push(encodeInt(ints));
                     } catch {
-                        throw new SyntaxError(` ${ints} is not type integer in list ${name}!`);
+                        console.log(`\x1b[31m${ints} is not type integer in list ${name}!\x1b[0m`);
+                        process.exit(1);
                     }
                 });
                 break;
@@ -96,7 +115,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                         try {
                             listData.push(writeList('', list, { isList: true })!);
                         } catch {
-                            throw new SyntaxError(`${list} is not type list in list ${name}!`);
+                            console.log(`\x1b[31m${list} is not type list in list ${name}!\x1b[0m`);
+                            process.exit(1);
                         }
                     });
                     break;
@@ -106,7 +126,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                     try {
                         listData.push(writeCompound('', compound, { isList: true })!);
                     } catch {
-                        throw new SyntaxError(`${compound} is not type compound in list ${name}!`);
+                        console.log(`\x1b[31m${compound} is not type compound in list ${name}!\x1b[0m`);
+                        process.exit(1);
                     }
                 });
                 break;
@@ -121,7 +142,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                                     try {
                                         listData.push(encodeByte(bytes));
                                     } catch {
-                                        throw new SyntaxError(`${bytes} is not type boolean in list ${name}!`);
+                                        console.log(`\x1b[31m${bytes} is not type boolean in list ${name}!\x1b[0m`);
+                                        process.exit(1);
                                     }
                                 });
                                 break;
@@ -132,7 +154,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                                     try {
                                         listData.push(encodeShort(shorts));
                                     } catch {
-                                        throw new SyntaxError(`${shorts} is not type boolean in list ${name}!`);
+                                        console.log(`\x1b[31m${shorts} is not type boolean in list ${name}!\x1b[0m`);
+                                        process.exit(1);
                                     }
                                 });
                                 break;
@@ -143,7 +166,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                                     try {
                                         listData.push(encodeLong(longs));
                                     } catch {
-                                        throw new SyntaxError(`${longs} is not type boolean in list ${name}!`);
+                                        console.log(`\x1b[31m${longs} is not type boolean in list ${name}!\x1b[0m`);
+                                        process.exit(1);
                                     }
                                 });
                                 break;
@@ -154,7 +178,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                                     try {
                                         listData.push(encodeFloat(floats));
                                     } catch {
-                                        throw new SyntaxError(`${floats} is not type boolean in list ${name}!`);
+                                        console.log(`\x1b[31m${floats} is not type boolean in list ${name}!\x1b[0m`);
+                                        process.exit(1);
                                     }
                                 });
                                 break;
@@ -165,7 +190,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                                     try {
                                         listData.push(encodeDouble(doubles));
                                     } catch {
-                                        throw new SyntaxError(`${doubles} is not type boolean in list ${name}!`);
+                                        console.log(`\x1b[31m${doubles} is not type boolean in list ${name}!\x1b[0m`);
+                                        process.exit(1);
                                     }
                                 });
                                 break;
@@ -178,7 +204,8 @@ export function jsonToNBT(file: object | Buffer): Buffer {
                     try {
                         listData.push(encodeString(strings));
                     } catch {
-                        throw new SyntaxError(`${strings} is not type boolean in list ${name}!`);
+                        console.log(`\x1b[31m${strings} is not type boolean in list ${name}!\x1b[0m`);
+                        process.exit(1);
                     }
                 });
                 break;
@@ -351,5 +378,7 @@ export function jsonToNBT(file: object | Buffer): Buffer {
     });
 
     nbt = Buffer.concat([nbt, Buffer.alloc(1)]);
-    return nbt;
-}
+    writeFileSync(join(path, `./${file.replace('.json', '.nbt')}`), nbt);
+    console.log(`\x1b[32mConverted ${file} to ${file.replace('.json', '.nbt')}!\x1b[0m`);
+    process.exit(0);
+};
