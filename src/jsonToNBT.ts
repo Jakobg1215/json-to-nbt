@@ -378,7 +378,7 @@ export default () => {
     });
 
     nbt = Buffer.concat([nbt, Buffer.alloc(1)]);
-    writeFileSync(join(path, `./${file.replace('.json', '.nbt')}`), nbt);
+    writeFileSync(join(path, `../${file.replace('.json', '.nbt')}`), nbt);
     console.log(`\x1b[32mConverted ${file} to ${file.replace('.json', '.nbt')}!\x1b[0m`);
     process.exit(0);
 };
