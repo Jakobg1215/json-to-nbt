@@ -14,6 +14,13 @@ json-to-nbt <file>
 ```bash
 json-to-nbt <path to file>
 ```
+---
+### cli options
+
+| Option | Default Value | Description                           |
+| -------| ------------- | --------------------------------------|
+| --name | `''`          | Specify the name of the first compound|
+
 ### javascript
 ```js
 const { jsonToNBT } = require('json-to-nbt');
@@ -25,7 +32,7 @@ import { jsonToNBT } from 'json-to-nbt';
 # Development
 - [ ] split fuctions into mutilple files
 - [x] allow use as a lib
-- [ ] first compound naming
+- [x] first compound naming
 - [ ] compression
 
 Please report any bugs found in bug reports

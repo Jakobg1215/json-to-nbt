@@ -31,6 +31,17 @@ export default () => {
 
     let nbt = Buffer.alloc(3);
     nbt.writeInt8(TagTypes.COMPOUND);
+    process.argv.forEach((arg, poz) => {
+        if (arg.toLowerCase() === '--name') {
+            if (process.argv[poz + 1]) {
+                const name = process.argv[poz + 1];
+                nbt.writeInt16BE(name.length, 1);
+                nbt = Buffer.concat([nbt, Buffer.from(name)]);
+                return;
+            }
+            console.log(`\x1b[33mName was not provided on --name!\x1b[0m`);
+        }
+    });
     const encodeByte = (data: string): Buffer => {
         const byteBuf = Buffer.alloc(1);
         byteBuf.writeInt8(parseInt(data));

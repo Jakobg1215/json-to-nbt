@@ -1,6 +1,6 @@
 import { TagTypes } from './TagTypes';
 
-export function jsonToNBT(file: object | Buffer): Buffer {
+export function jsonToNBT(file: object | Buffer, compoundName?: string): Buffer {
     const fileData = Buffer.isBuffer(file)
         ? file.filter(v => v !== 0x0d && v !== 0x0a).toString()
         : JSON.stringify(file);
@@ -14,6 +14,10 @@ export function jsonToNBT(file: object | Buffer): Buffer {
 
     let nbt = Buffer.alloc(3);
     nbt.writeInt8(TagTypes.COMPOUND);
+    if (compoundName) {
+        nbt.writeInt16BE(compoundName.length, 1);
+        nbt = Buffer.concat([nbt, Buffer.from(compoundName)]);
+    }
     const encodeByte = (data: string): Buffer => {
         const byteBuf = Buffer.alloc(1);
         byteBuf.writeInt8(parseInt(data));
