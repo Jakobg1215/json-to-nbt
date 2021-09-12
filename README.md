@@ -34,6 +34,6 @@ import { jsonToNBT } from 'json-to-nbt';
 - [ ] split fuctions into mutilple files
 - [x] allow use as a lib
 - [x] first compound naming
-- [ ] compression
+- [X] compression
 
 Please report any bugs found in bug reports

@@ -1,6 +1,6 @@
 {
   "name": "json-to-nbt",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "A converter to convert json to nbt!",
   "main": "./dist/index",
   "bin": "./to-nbt",
