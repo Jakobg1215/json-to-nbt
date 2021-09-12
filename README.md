@@ -17,10 +17,10 @@ json-to-nbt <path to file>
 ---
 ### cli options
 
-| Option     | Default Value | Description                           |
-| ---------- | ------------- | --------------------------------------|
-| --name     | `''`          | Specify the name of the first compound|
-| --compress | false         | Commpresses the nbt file with gzip    |
+| Option     | Default Value  | Description                           |
+| ---------- | -------------- | --------------------------------------|
+| --name     | `''`           | Specify the name of the first compound|
+| --compress | `false`        | Commpresses the nbt file with gzip    |
 
 ### javascript
 ```js
