@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { gzipSync } from 'node:zlib';
 
 import { TagTypes } from './TagTypes';
 
@@ -389,6 +390,18 @@ export default () => {
     });
 
     nbt = Buffer.concat([nbt, Buffer.alloc(1)]);
+    process.argv.forEach((arg, poz) => {
+        if (arg.toLowerCase() === '--compress') {
+            if (process.argv[poz + 1]) {
+                if (process.argv[poz + 1] === 'true') {
+                    nbt = gzipSync(nbt);
+                    return;
+                }
+                return;
+            }
+            console.log(`\x1b[33mBoolean was not provided on --compress!\x1b[0m`);
+        }
+    });
     writeFileSync(join(path, `../${file.replace('.json', '.nbt')}`), nbt);
     console.log(`\x1b[32mConverted ${file} to ${file.replace('.json', '.nbt')}!\x1b[0m`);
     process.exit(0);
