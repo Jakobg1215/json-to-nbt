@@ -1,6 +1,6 @@
 {
   "name": "json-to-nbt",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "A converter to convert json to nbt!",
   "main": "./dist/index",
   "bin": "./to-nbt",
@@ -27,7 +27,6 @@
   "scripts": {
     "build": "tsc",
     "prettier": "prettier src --config .prettierrc --write",
-    "pretest": "tsc",
-    "test": "node dist/index"
+    "pretest": "tsc"
   }
 }

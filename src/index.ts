@@ -1,3 +1,5 @@
+import { Buffer } from 'node:buffer';
+
 import { TagTypes } from './TagTypes';
 
 export function jsonToNBT(file: object | Buffer, compoundName?: string): Buffer {

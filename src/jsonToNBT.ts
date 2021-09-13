@@ -1,5 +1,7 @@
+import { Buffer } from 'node:buffer';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import process from 'node:process';
 import { gzipSync } from 'node:zlib';
 
 import { TagTypes } from './TagTypes';
